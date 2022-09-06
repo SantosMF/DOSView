@@ -237,8 +237,6 @@ class Window(QMainWindow):
             else:
                 self.orbital.clear()
                 self.orbital.addItem("Inative pDOS function!")
-                self.combo22.clear()
-                self.combo22.addItems(["lDOS"])
         elif parameters == 's':
             if self.mono.isChecked() == False:
                 self.orbital.clear()
