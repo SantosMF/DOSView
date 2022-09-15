@@ -32,14 +32,10 @@ def DOS(file, serie):
             eV = data[0]
             dos.append(data[1])
     soma = (sum(dos))
-    val = []
-    for i, j in zip(eV, soma):
-        val.append(f'{i:.3E}\t{j:.3E}\n')
-    texto = ''.join(map(str,val))
     if serie == '+':
-        return texto, eV, soma
+        return eV, soma
     elif serie == '-':
-        return texto, eV, soma*-1
+        return eV, soma*-1
 #--------------------- função que retorna o intdos ----------------------------
 def intDOS(file, serie):
     files = file.split(';')
@@ -50,14 +46,10 @@ def intDOS(file, serie):
             eV = data[0]
             intdos.append(data[2])
     soma = (sum(intdos))
-    val = []
-    for i, j in zip(eV, soma):
-        val.append(f'{i:.3E}\t{j:.3E}\n')
-    texto = ''.join(map(str,val))
     if serie == '+':
-        return texto, eV, soma
+        return eV, soma
     elif serie == '-':
-        return texto, eV, soma*-1
+        return eV, soma*-1
 #--------------------- função que retorna o pdos ----------------------------
 def PDOS(file, serie, orbital):
     files = file.split(';')
@@ -69,14 +61,10 @@ def PDOS(file, serie, orbital):
                 eV = data[0]
                 pdos.append(data[spd[orbital]])
         soma = np.sum(pdos,axis=0)
-        val = []
-        for i, j in zip(eV, soma):
-            val.append(f'{i:.3E}\t{j:.3E}\n')
-        texto = ''.join(map(str,val))
         if serie == '+':
-            return texto, eV, soma
+            return eV, soma
         elif serie == '-':
-            return texto, eV, soma*-1
+            return eV, soma*-1
     except:
         return None
 #--------------------- função que retorna o pdos ----------------------------
@@ -89,14 +77,10 @@ def LDOS(file, serie):
             eV = data[0]
             ldos.append(data[1])
     soma = np.sum(ldos,axis=0)
-    val = []
-    for i, j in zip(eV, soma):
-        val.append(f'{i:.3E}\t{j:.3E}\n')
-    texto = ''.join(map(str,val))
     if serie == '+':
-        return texto, eV, soma
+        return eV, soma
     elif serie == '-':
-        return texto, eV, soma*-1
+        return eV, soma*-1
 #--------------------- função que retorna o ldosup ----------------------------
 def LDOSUP(file, serie):
     files = file.split(';')
@@ -107,14 +91,10 @@ def LDOSUP(file, serie):
             eV = data[0]
             ldosup.append(data[1])
     soma = np.sum(ldosup,axis=0)
-    val = []
-    for i, j in zip(eV, soma):
-        val.append(f'{i:.3E}\t{j:.3E}\n')
-    texto = ''.join(map(str,val))
     if serie == '+':
-        return texto, eV, soma
+        return eV, soma
     elif serie == '-':
-        return texto, eV, soma*-1
+        return eV, soma*-1
 #--------------------- função que retorna o ldosdw ----------------------------
 def LDOSDW(file, serie):
     files = file.split(';')
@@ -125,14 +105,10 @@ def LDOSDW(file, serie):
             eV = data[0]
             ldosdw.append(data[2])
     soma = np.sum(ldosdw,axis=0)
-    val = []
-    for i, j in zip(eV, soma):
-        val.append(f'{i:.3E}\t{j:.3E}\n')
-    texto = ''.join(map(str,val))
     if serie == '+':
-        return texto, eV, soma
+        return eV, soma
     elif serie == '-':
-        return texto, eV, soma*-1
+        return eV, soma*-1
 def Resp(a,b,c,d): # a = files; b = séries; c = tipo de cálculo; d = orbitais
     if c == 'DOS':
         return DOS(a, b)
