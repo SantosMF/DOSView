@@ -8,11 +8,11 @@ Created on Mon Aug 29 11:37:05 2022
 import numpy as np
 spd = {"s [column 3]":2, "s(up) [column 4]":3, "s(down) [column 5]":4,
 
-"px [column 3]":2, "py [column 4]":3, "pz [column 5]":4,"px(up) [column 4]":3,
-"px(down) [column 5]":4, "py(up) [column 6]":5,"py(down) [column 7]":6,
-"pz(up) [column 8]":7, "pz(down) [column 9]":8,
+"px [column 3]":2, "py [column 4]":3, "pz [column 5]":4,
+"px(up) [column 4]":3,"px(down) [column 5]":4, "py(up) [column 6]":5,
+"py(down) [column 7]":6, "pz(up) [column 8]":7, "pz(down) [column 9]":8,
 
-"dz2 [column 3]":2,"dxz [column 4]":3, "dyz [column 5]":4,"dxy [column 6]":5,"dx2-y2 [column 8]":7,
+"dz2 [column 3]":2,"dxz [column 4]":3, "dyz [column 5]":4,"dxy [column 6]":5,"dx2-y2 [column 7]":6,
 
 "dz2(up) [column 4]":3, "dz2(down) [column 5]":4,"dxz(up) [column 6]":5,
 "dxz(down) [column 7]":6, "dyz(up) [column 8]":7,"dyz(down) [column 9]":8,
@@ -22,11 +22,11 @@ spd = {"s [column 3]":2, "s(up) [column 4]":3, "s(down) [column 5]":4,
 "fz3 [column 3]":2, "fxz2 [column 4]":3,"fyz2 [column 5]":4, "fxyz [column 6]":5,
 "fz [column 7]":6, "fx [column 8]":7, "fy [column 9]":8,
 
- "fz3(up) [column 3]":2,"fz3(down) [column 4]":3,
-"fxz2(up) [column 5]":4, "fxz2(down) [column 6]":5,"fyz2(up) [column 7]":6,
-"fyz2(down) [column 8]":7, "fxyz(up) [column 9]":8,"fxyz(down) [column 10]":9,
-"fz(up) [column 11]":10, "fz(down) [column 12]":11,"fx(up) [column 13]":12,
-"fx(down) [column 14]":13, "fy(up) [column 15]":14,"fy(down) [column 16]":15}
+ "fz3(up) [column 4]":3,"fz3(down) [column 5]":4,
+"fxz2(up) [column 6]":5, "fxz2(down) [column 7]":6,"fyz2(up) [column 8]":7,
+"fyz2(down) [column 9]":8, "fxyz(up) [column 10]":9,"fxyz(down) [column 11]":10,
+"fz(up) [column 12]":11, "fz(down) [column 13]":12,"fx(up) [column 14]":13,
+"fx(down) [column 15]":14, "fy(up) [column 16]":15,"fy(down) [column 17]":16}
 
 #print(spd['dx2-y2 [column 8]'])
 
