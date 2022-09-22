@@ -5,23 +5,20 @@ Created on Sun Oct 10 23:57:47 2021
 
 @author: marcio
 """
-cor = ['#FF0000', '#00FF00','#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#006400', "#000080", '#FF8C00', '#FF4500',	'#9400D3']
+
 import sys
 #PyQt5
 import time
 from PyQt5.QtWidgets import (QFileDialog, QMainWindow, QMessageBox, QPushButton,
                              QLabel, QApplication, QRadioButton, QFrame, QWidget,
-                             QLineEdit, QComboBox, QVBoxLayout, QProgressBar)
+                             QLineEdit, QComboBox, QProgressBar,QColorDialog)
 from PyQt5.QtCore import  QRect
 from PyQt5 import QtCore
 from PyQt5.QtGui import QIcon
-# matplotlib
-import matplotlib as mpl
-from cycler import cycler
-mpl.rcParams['axes.prop_cycle'] = cycler(color=cor)
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
-from matplotlib.figure import Figure
-from matplotlib.ticker import AutoMinorLocator
+import pyqtgraph as pg
+import pyqtgraph.exporters
+pg.setConfigOption('background', 'w')
+pg.setConfigOption('foreground', 'k')
 import os # interage com o sistema operacional
 import modulo3 ## módulo das funções DOS E pDOS
 import numpy as np
@@ -32,17 +29,6 @@ cor_texto = 'white' # Cor do texto na caixa de textos
 line_edit = 'background:#707070;font-size:14px' # Linha de inserção de dados
 path = os.path.dirname(os.path.realpath(__file__))
 ##############################################################################
-class MplCanvas(FigureCanvasQTAgg):
-    def __init__(self, parent=None, width=9, height=6, dpi=400):
-        self.fig = Figure(figsize=(width, height), dpi=dpi,facecolor='#656565')
-        self.fig.set_tight_layout(True)
-        self.axes = self.fig.add_subplot(111)# linha; coluna; posição;
-        self.axes.set_facecolor("white")
-        self.axes.xaxis.set_minor_locator(AutoMinorLocator(5))
-        self.axes.yaxis.set_minor_locator(AutoMinorLocator(5))
-        self.axes.axhline(y=0, linestyle='--', color='k')
-        self.axes.axvline(x=0, linestyle='--', color='k')
-        super(MplCanvas, self).__init__(self.fig)
 class Window(QMainWindow):
     def __init__(self):
         super(QMainWindow, self).__init__()
@@ -90,14 +76,14 @@ class Window(QMainWindow):
         self.series = QLabel(self.GrupDOS,text='Série')
         self.series.setGeometry(10, 80, 50, 30)
         self.series.setStyleSheet("font-size:14px")
-        self.combo11 = QComboBox(self.GrupDOS)
-        self.combo11.setGeometry(50, 80, 55, 30)
-        self.combo11.setStyleSheet("font-size:14px")
-        self.combo11.addItems(["+","-"])
-        self.combo12 = QComboBox(self.GrupDOS)
-        self.combo12.setGeometry(110, 80, 140, 30)
-        self.combo12.setStyleSheet("font-size:14px")
-        self.combo12.addItems(["DOS","intDOS"])
+        self.SerieDOS = QComboBox(self.GrupDOS)
+        self.SerieDOS.setGeometry(50, 80, 55, 30)
+        self.SerieDOS.setStyleSheet("font-size:14px")
+        self.SerieDOS.addItems(["+","-"])
+        self.comboDOS = QComboBox(self.GrupDOS)
+        self.comboDOS.setGeometry(110, 80, 140, 30)
+        self.comboDOS.setStyleSheet("font-size:14px")
+        self.comboDOS.addItems(["DOS","intDOS"])
         self.Calculete13 = QPushButton(self.GrupDOS, text='Calcule')
         self.Calculete13.setGeometry(QRect(255, 80, 100, 30))
         self.Calculete13.setToolTip("to calculete")
@@ -121,14 +107,14 @@ class Window(QMainWindow):
         self.series1 = QLabel(self.GrupPDOS,text='Série')
         self.series1.setGeometry(10, 110, 50, 30)
         self.series1.setStyleSheet("font-size:14px")
-        self.combo21 = QComboBox(self.GrupPDOS)
-        self.combo21.setGeometry(50, 110, 55, 30)
-        self.combo21.setStyleSheet("font-size:14px")
-        self.combo21.addItems(["+","-"])
-        self.combo22 = QComboBox(self.GrupPDOS)
-        self.combo22.setGeometry(110, 110, 140, 30)
-        self.combo22.addItems(["lDOS", "pDOS"])
-        self.combo22.setStyleSheet("font-size:14px")
+        self.SeriePDOS = QComboBox(self.GrupPDOS)
+        self.SeriePDOS.setGeometry(50, 110, 55, 30)
+        self.SeriePDOS.setStyleSheet("font-size:14px")
+        self.SeriePDOS.addItems(["+","-"])
+        self.comboPDOS = QComboBox(self.GrupPDOS)
+        self.comboPDOS.setGeometry(110, 110, 140, 30)
+        self.comboPDOS.addItems(["lDOS", "pDOS"])
+        self.comboPDOS.setStyleSheet("font-size:14px")
 #-----------------------------------------------------------------------------
         self.label = QLabel(self.GrupPDOS,text='Orbitals')
         self.label.setGeometry(10, 75, 100, 30)
@@ -176,9 +162,6 @@ class Window(QMainWindow):
         self.btn_remove.clicked.connect(self.Remove) ##
         self.btn_remove.setStyleSheet("font-size:14px")
         self.btn_remove.setToolTip("Remove the current data")
-
-
-
 #-------------------------botões 2 ---------------------------------------------
         self.GrupButton2 = QFrame(self)
         self.GrupButton2.setGeometry(10,430,360,40)
@@ -192,29 +175,27 @@ class Window(QMainWindow):
         self.btn_6.clicked.connect(self.Salvar) ## conecta a função salvar
         self.btn_6.setStyleSheet("font-size:14px")
 
-        self.btn_clean = QPushButton(self.GrupButton2,text='')#
-        self.btn_clean.setGeometry(QRect(185, 5, 80, 30))
-        #self.btn_clean.clicked.connect() ##
-        #self.btn_clean.setStyleSheet("font-size:14px")
-        self.btn_clean.blockSignals(True)
         self.btn_4 = QPushButton(self.GrupButton2,text='Save Figure')#
-        self.btn_4.setGeometry(QRect(275, 5, 80, 30))
+        self.btn_4.setGeometry(QRect(185, 5, 80, 30))
         self.btn_4.clicked.connect(self.SaveFig) ##
         self.btn_4.setStyleSheet("font-size:14px")
         self.btn_4.setToolTip("Save the graphic as .png")
 
+        self.btn_color = QPushButton(self.GrupButton2,text='line color')#
+        self.btn_color.setGeometry(QRect(275, 5, 80, 30))
+        self.btn_color.clicked.connect(self.color_picker) ##
+        self.btn_color.setStyleSheet("font-size:14px;background:#cc0000")
+        #self.btn_clean.blockSignals(True)
+
 #------------------- área gráfica PDOS ---------------------------------------
-        self.grafico = MplCanvas(self, width=16, height=9, dpi=100)
-        self.toolbar1 = NavigationToolbar(self.grafico, self.frame1)
-        self.layout1 = QVBoxLayout(self.frame1)
-        self.layout1.addWidget(self.toolbar1)
-        self.layout1.addWidget(self.grafico)
-        self.grafico1 = QWidget(self.frame1)
-        self.grafico1.setLayout(self.layout1)
-        self.grafico1.setGeometry(0,0, 620, 480)
+        #self.layout1 = QVBoxLayout(self.frame1)
+        self.graph = pg.PlotWidget(self.frame1)
+        self.graph.setGeometry(10,10,600,420)
+        self.graph.showAxis('right')
+        self.graph.showAxis('top')
 #------------------- Controle de dados ---------------------------------------
         self.data = {} # Dicionário com os arrays
-        self.data_text = {} # Dicionário com os textos ## obsolete
+        self.line_color = '#cc0000'
         self.cont = 1 # Variável de controle
         self.chaves = [] # lista com as chaves
         self.orbitais = None
@@ -222,16 +203,21 @@ class Window(QMainWindow):
     def Magnetic(self):
         self.Combo(self.orbitais)
         if self.mono.isChecked() == True:# ativa os orbitais
-            self.combo22.clear()
-            self.combo22.addItems(["lDOSUP","lDOSDW", "pDOS"])
-            self.combo12.clear()
-            self.combo12.addItems(["DOSUP","DOSDW"])
+            self.comboPDOS.clear()
+            self.comboPDOS.addItems(["lDOSUP","lDOSDW", "pDOS"])
+            self.comboDOS.clear()
+            self.comboDOS.addItems(["DOSUP","DOSDW"])
         elif self.mono.isChecked() == False:# ativa os orbitais
-            self.combo22.clear()
-            self.combo22.addItems(["lDOS", "pDOS"])
-            self.combo12.clear()
-            self.combo12.addItems(["DOS","intDOS"])
+            self.comboPDOS.clear()
+            self.comboPDOS.addItems(["lDOS", "pDOS"])
+            self.comboDOS.clear()
+            self.comboDOS.addItems(["DOS","intDOS"])
 ##############################################################################
+    def color_picker(self):
+        color = QColorDialog.getColor()
+        self.btn_color.setStyleSheet("QWidget { background-color: %s}" % color.name())
+        self.line_color = color.name()
+       # print(self.line_color)
     def Combo(self, parameters):
         if parameters == None:
             if self.line_pdosV.text() == '':
@@ -285,8 +271,8 @@ class Window(QMainWindow):
 ##############################################################################
 #------------------------ Funções do D O S -----------------------------------
     def DOS(self):
-        X1 = self.combo11.currentText() # serie
-        X2 = self.combo12.currentText() # tipo de dados
+        X1 = self.SerieDOS.currentText() # serie
+        X2 = self.comboDOS.currentText() # tipo de dados
         if self.line_dosV.text() != '': #
             self.main_widget.progress = QProgressBar(self.frame1)
             self.main_widget.progress.show()
@@ -300,8 +286,8 @@ class Window(QMainWindow):
             self.chaves.insert(0, key)
             self.s_data.clear()
             self.s_data.addItems(self.chaves) # adiciona nome no combobox
-            self.Grafico(eV, pdos) # plota o gráfico
-            self.data[key] = [eV, pdos] # add in dict data array
+            self.Grafico(eV, pdos, self.line_color) # plota o gráfico
+            self.data[key] = [eV, pdos, self.line_color] # add in dict data array
             self.cont += 1 #atualiza o contador
         else:
             self.messageBox.about(self,"Error", 'Insert the dos.x outfile!')
@@ -319,13 +305,13 @@ class Window(QMainWindow):
 #---------------------- Funções do p D O S -----------------------------------
     def pDOS(self):
         try:
-            if self.combo22.currentText() == 'pDOS':
-                Y1 = self.combo21.currentText()
+            if self.comboPDOS.currentText() == 'pDOS':
+                Y1 = self.SeriePDOS.currentText()
                 Y2 = 'pDOS'
                 Y3 = self.orbital.currentText()
             else:
-                Y1 = self.combo21.currentText() # série
-                Y2 = self.combo22.currentText() # tipo de dado
+                Y1 = self.SeriePDOS.currentText() # série
+                Y2 = self.comboPDOS.currentText() # tipo de dado
                 Y3 = None
             if self.line_pdosV.text() != '':
                 self.main_widget.progress = QProgressBar(self.frame1)
@@ -342,8 +328,8 @@ class Window(QMainWindow):
                 self.chaves.insert(0, key)
                 self.s_data.clear()
                 self.s_data.addItems(self.chaves) # adiciona nome no combobox
-                self.Grafico(eV, pdos) # plota o gráfico
-                self.data[key] = [eV, pdos] # add in dict data array
+                self.Grafico(eV, pdos, self.line_color) # plota o gráfico
+                self.data[key] = [eV, pdos, self.line_color] # add in dict data array
                 #self.data_text[key] = dados[0] # add in dict text
                 self.cont += 1 #atualiza o contador
             else:
@@ -387,6 +373,12 @@ class Window(QMainWindow):
         self.line_dosV.clear()
         self.orbitais = None
         self.orbital.clear()
+        self.s_data.clear()
+        self.graph.clear()
+        self.data.clear()
+        self.chaves.clear()
+        self.line_color = '#cc0000'
+        self.btn_color.setStyleSheet("font-size:14px;background:#cc0000")
     def Salvar(self):
         self.fileName2, _ = QFileDialog.getSaveFileName(None, path, ".csv","CSV files (*.csv);;",)
         try:
@@ -396,40 +388,47 @@ class Window(QMainWindow):
         except: pass
 
 ###############################################################################
-    def Grafico(self, a, b):
+    def Grafico(self, a, b, c):
         self.Progress()########################
-        self.grafico.axes.plot(a, b, '-', linewidth=1.0)
-        self.grafico.fig.canvas.draw() ## """Atualiza o gráfico"""
+        self.graph.plot(a, b, pen = c, linewidth=0.5)
     def SaveFig(self):
-        path = QFileDialog.getSaveFileName(self, 'Save as', '.png', '*.png')
-        if path != ('', ''):
-            self.grafico.fig.savefig(path[0],dpi=400, grid=False)
+        #path = QFileDialog.getSaveFileName(self, 'Save as', '.png', '*.png')
+        #if path != ('', ''):
+            exp = pyqtgraph.exporters.ImageExporter(self.graph.plotItem)
+            exp.parameters()['width'] = 1000
+            exp.export("./fname")
+            print("saved","./fname")
+
+           # self.graph.fig.savefig(path[0],dpi=400, grid=False)
     def Remove(self):
         if self.s_data.currentText() in self.data:
             self.data.pop(self.s_data.currentText()) # remove data of dict
-            #self.data_text.pop(self.s_data.currentText()) # remove data of dict
+            self.chaves.remove(self.s_data.currentText())
             self.s_data.removeItem(self.s_data.currentIndex())
-            self.grafico.axes.clear()
-            self.line_pdosV.clear()
-            self.line_dosV.clear()
-            self.grafico.axes.axhline(y=0, linestyle='--', color='k')
-            self.grafico.axes.axvline(x=0, linestyle='--', color='k')
+            self.cont = self.cont - 1
+            self.graph.clear()
             for i in self.data:
-                x, y = self.data[i][0], self.data[i][1]
-                self.grafico.axes.plot(x, y, linewidth=1.0)
-                self.grafico.axes.xaxis.set_minor_locator(AutoMinorLocator(5))
-                self.grafico.axes.yaxis.set_minor_locator(AutoMinorLocator(5))
-                self.grafico.fig.canvas.draw()
+                x, y, c = self.data[i][0], self.data[i][1], self.data[i][2]
+                self.graph.plot(x,y, pen=c)
             try:
                 pass
             except:
                 self.data_text.clear()
                 self.chaves.clear()
                 self.cont = 1
+        elif len(self.data) == 0:
+                self.chaves.clear()
         else:
-            self.messageBox.about(self, 'Info', 'No data to remove')
-        if len(self.data) == 0:
-            self.Erase()
+            self.graph.clear()
+            self.orbital.clear()
+            self.s_data.clear()
+            self.data.clear()
+            self.chaves.clear()
+            self.cont = 1
+            self.line_color = '#cc0000'
+            self.btn_color.setStyleSheet("font-size:14px;background:#cc0000")
+            #self.messageBox.about(self, 'Info', 'No data to remove')
+
     def Progress(self):
         TIME_LIMIT = 100
         count = 62
