@@ -319,7 +319,7 @@ class Window(QMainWindow):
 #---------------------- Funções do p D O S -----------------------------------
     def pDOS(self):
         try:
-            if self.combo21.currentText() == 'pDOS':
+            if self.combo22.currentText() == 'pDOS':
                 Y1 = self.combo21.currentText()
                 Y2 = 'pDOS'
                 Y3 = self.orbital.currentText()
