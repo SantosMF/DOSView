@@ -8,4 +8,5 @@ os.system("python3 -m pip install numpy")
 os.system("python3 -m pip install pyqt5")
 os.system("python3 -m pip install pyqtgraph")
 os.system("chmod u+x edosv.py")
-os.system(f"sudo ln -sf {path}/edosv.py /usr/bin/edosv")
+os.system(f"ln -s {path}/edosv.desktop  ~/.local/share/applications/edosv.desktop")
+

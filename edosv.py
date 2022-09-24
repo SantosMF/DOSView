@@ -11,14 +11,13 @@ import sys
 import time
 from PyQt5.QtWidgets import (QFileDialog, QMainWindow, QMessageBox, QPushButton,
                              QLabel, QApplication, QRadioButton, QFrame, QWidget,
-                             QLineEdit, QComboBox, QProgressBar,QColorDialog)
+                             QLineEdit, QComboBox, QProgressBar,QColorDialog, QVBoxLayout)
 from PyQt5.QtCore import  QRect
 from PyQt5 import QtCore
 from PyQt5.QtGui import QIcon
-import pyqtgraph as pg
-import pyqtgraph.exporters
-pg.setConfigOption('background', 'w')
-pg.setConfigOption('foreground', 'k')
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
+from matplotlib.figure import Figure
+from matplotlib.ticker import AutoMinorLocator
 import os # interage com o sistema operacional
 import modulo3 ## módulo das funções DOS E pDOS
 import numpy as np
@@ -29,6 +28,18 @@ cor_texto = 'white' # Cor do texto na caixa de textos
 line_edit = 'background:#707070;font-size:14px' # Linha de inserção de dados
 path = os.path.dirname(os.path.realpath(__file__))
 ##############################################################################
+class MplCanvas(FigureCanvasQTAgg):
+    def __init__(self, parent=None, width=9, height=6, dpi=400):
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        self.fig.set_tight_layout(True)
+        self.lin, self.col, self.ID = 1,1,1
+        self.axes = self.fig.add_subplot(self.lin, self.col, self.ID)# linha; coluna; posição;
+        self.axes.set_facecolor("white")
+        self.axes.axvline(0, color='k', linewidth=0.5, linestyle='--')
+        self.axes.axhline(0, color='k', linewidth=0.5, linestyle='--')
+        self.axes.xaxis.set_minor_locator(AutoMinorLocator(5))
+        self.axes.yaxis.set_minor_locator(AutoMinorLocator(5))
+        super(MplCanvas, self).__init__(self.fig)
 class Window(QMainWindow):
     def __init__(self):
         super(QMainWindow, self).__init__()
@@ -184,21 +195,27 @@ class Window(QMainWindow):
         self.btn_color = QPushButton(self.GrupButton2,text='line color')#
         self.btn_color.setGeometry(QRect(275, 5, 80, 30))
         self.btn_color.clicked.connect(self.color_picker) ##
-        self.btn_color.setStyleSheet("font-size:14px;background:#cc0000")
-        #self.btn_clean.blockSignals(True)
+        self.btn_color.setStyleSheet("font-size:14px")
 
 #------------------- área gráfica PDOS ---------------------------------------
-        #self.layout1 = QVBoxLayout(self.frame1)
-        self.graph = pg.PlotWidget(self.frame1)
-        self.graph.setGeometry(10,10,600,420)
-        self.graph.showAxis('right')
-        self.graph.showAxis('top')
+        self.graph = MplCanvas(self, width=16, height=9, dpi=100)
+        self.toolbar2 = NavigationToolbar(self.graph, self.frame1)
+        self.layout2 = QVBoxLayout(self.frame1)
+        self.layout2.addWidget(self.toolbar2)
+        self.layout2.addWidget(self.graph)
+        self.grafico2 = QWidget(self.frame1)
+        self.grafico2.setLayout(self.layout2)
+        self.grafico2.setGeometry(0,0, 620, 500)
 #------------------- Controle de dados ---------------------------------------
         self.data = {} # Dicionário com os arrays
-        self.line_color = '#cc0000'
+        self.line_color = '#000000'
         self.cont = 1 # Variável de controle
         self.chaves = [] # lista com as chaves
         self.orbitais = None
+        
+        self.frame_color = QFrame(self)
+        self.frame_color.setGeometry(10, 475, 360, 10)
+        self.frame_color.setStyleSheet("background:#000000")
 #-----------------------------------------------------------------------------
     def Magnetic(self):
         self.Combo(self.orbitais)
@@ -215,7 +232,7 @@ class Window(QMainWindow):
 ##############################################################################
     def color_picker(self):
         color = QColorDialog.getColor()
-        self.btn_color.setStyleSheet("QWidget { background-color: %s}" % color.name())
+        self.frame_color.setStyleSheet("QWidget { background-color: %s}" % color.name())
         self.line_color = color.name()
        # print(self.line_color)
     def Combo(self, parameters):
@@ -244,8 +261,8 @@ class Window(QMainWindow):
         elif parameters == 'd':
             if self.mono.isChecked() == False:
                 self.orbital.clear()
-                self.orbital.addItems(["dz2 [column 4]", "dxz [column 5]", "dyz [column 6]",
-                                  "dxy [column 7]", "dx2-y2 [column 8]"])
+                self.orbital.addItems(["dz2 [column 3]", "dxz [column 4]", "dyz [column 5]",
+                                  "dxy [column 6]", "dx2-y2 [column 7]"])
             elif self.mono.isChecked() == True:
                 self.orbital.clear()
                 self.orbital.addItems(["dz2(up) [column 4]", "dz2(down) [column 5]",
@@ -261,13 +278,13 @@ class Window(QMainWindow):
                                       "fz [column 7]","fx [column 8]","fy [column 9]"])
             elif self.mono.isChecked() == True:
                 self.orbital.clear()
-                self.orbital.addItems(["fz3(up) [column 3]", "fz3(down) [column 4]",
-                                  "fxz2(up) [column 5]", "fxz2(down) [column 6]",
-                                  "fyz2(up) [column 7]", "fyz2(down) [column 8]",
-                                  "fxyz(up) [column 9]", "fxyz(down) [column 10]",
-                                  "fz(up) [column 11]", "fz(down) [column 12]",
-                                  "fx(up) [column 13]", "fx(down) [column 14]",
-                                  "fy(up) [column 15]", "fy(down) [column 16]"])
+                self.orbital.addItems(["fz3(up) [column 4]", "fz3(down) [column 5]",
+                                  "fxz2(up) [column 6]", "fxz2(down) [column 7]",
+                                  "fyz2(up) [column 8]", "fyz2(down) [column 9]",
+                                  "fxyz(up) [column 10]", "fxyz(down) [column 11]",
+                                  "fz(up) [column 12]", "fz(down) [column 13]",
+                                  "fx(up) [column 14]", "fx(down) [column 15]",
+                                  "fy(up) [column 16]", "fy(down) [column 17]"])
 ##############################################################################
 #------------------------ Funções do D O S -----------------------------------
     def DOS(self):
@@ -277,7 +294,7 @@ class Window(QMainWindow):
             self.main_widget.progress = QProgressBar(self.frame1)
             self.main_widget.progress.show()
             self.main_widget.progress.setStyleSheet("font-size:10px")
-            self.main_widget.progress.setGeometry(10, 460, 500, 10)
+            self.main_widget.progress.setGeometry(10, 490, 980, 10)
             self.main_widget.progress.setMaximum(100)
             self.main_widget.progress.setValue(59)
             dados = modulo3.Resp(self.line_dosV.text(),X1,X2,None)
@@ -314,10 +331,10 @@ class Window(QMainWindow):
                 Y2 = self.comboPDOS.currentText() # tipo de dado
                 Y3 = None
             if self.line_pdosV.text() != '':
-                self.main_widget.progress = QProgressBar(self.frame1)
+                self.main_widget.progress = QProgressBar(self)
                 self.main_widget.progress.show()
                 self.main_widget.progress.setStyleSheet("font-size:10px")
-                self.main_widget.progress.setGeometry(10, 460, 500, 10)
+                self.main_widget.progress.setGeometry(10, 490, 980, 10)
                 self.main_widget.progress.setMaximum(100)
                 self.main_widget.progress.setValue(53)
                 #---------- leitura dos dados --------------------------------
@@ -374,11 +391,12 @@ class Window(QMainWindow):
         self.orbitais = None
         self.orbital.clear()
         self.s_data.clear()
-        self.graph.clear()
+        self.graph.axes.clear()
+        self.graph.fig.canvas.draw()
         self.data.clear()
         self.chaves.clear()
-        self.line_color = '#cc0000'
-        self.btn_color.setStyleSheet("font-size:14px;background:#cc0000")
+        self.line_color = '#000000'
+        self.frame_color.setStyleSheet("background:#000000")
     def Salvar(self):
         self.fileName2, _ = QFileDialog.getSaveFileName(None, path, ".csv","CSV files (*.csv);;",)
         try:
@@ -390,45 +408,40 @@ class Window(QMainWindow):
 ###############################################################################
     def Grafico(self, a, b, c):
         self.Progress()########################
-        self.graph.plot(a, b, pen = c, linewidth=0.5)
+        self.graph.axes.plot(a, b, color = c, linewidth=1)
+        self.graph.fig.canvas.draw()
     def SaveFig(self):
-        #path = QFileDialog.getSaveFileName(self, 'Save as', '.png', '*.png')
-        #if path != ('', ''):
-            exp = pyqtgraph.exporters.ImageExporter(self.graph.plotItem)
-            exp.parameters()['width'] = 1000
-            exp.export("./fname")
-            print("saved","./fname")
-
-           # self.graph.fig.savefig(path[0],dpi=400, grid=False)
+        path = QFileDialog.getSaveFileName(self, 'Save as', '.png', '*.png')
+        if path != ('', ''):
+            self.graph.fig.savefig(path[0],dpi=400, grid=False)
     def Remove(self):
-        if self.s_data.currentText() in self.data:
+        try:
+            self.graph.axes.clear()              
+            self.graph.axes.axvline(0, color='k', linewidth=0.5, linestyle='--')
+            self.graph.axes.axhline(0, color='k', linewidth=0.5, linestyle='--')
             self.data.pop(self.s_data.currentText()) # remove data of dict
             self.chaves.remove(self.s_data.currentText())
             self.s_data.removeItem(self.s_data.currentIndex())
-            self.cont = self.cont - 1
-            self.graph.clear()
-            for i in self.data:
-                x, y, c = self.data[i][0], self.data[i][1], self.data[i][2]
-                self.graph.plot(x,y, pen=c)
-            try:
-                pass
-            except:
-                self.data_text.clear()
-                self.chaves.clear()
-                self.cont = 1
-        elif len(self.data) == 0:
-                self.chaves.clear()
-        else:
-            self.graph.clear()
-            self.orbital.clear()
-            self.s_data.clear()
-            self.data.clear()
-            self.chaves.clear()
-            self.cont = 1
-            self.line_color = '#cc0000'
-            self.btn_color.setStyleSheet("font-size:14px;background:#cc0000")
-            #self.messageBox.about(self, 'Info', 'No data to remove')
-
+            if len(self.data) > 0:
+                self.cont = self.cont - 1
+                for i in self.data:
+                    x, y, c = self.data[i][0], self.data[i][1], self.data[i][2]
+                    self.graph.axes.plot(x,y, color=c, linewidth=1)
+                    self.graph.fig.canvas.draw()
+            elif len(self.data) == 0:
+                    self.orbital.clear()
+                    self.s_data.clear()
+                    self.data.clear()
+                    self.chaves.clear()
+                    self.cont = 1
+                    self.line_color = '#cc0000'
+                    self.btn_color.setStyleSheet("background:#000000")
+                    self.chaves.clear()
+                    self.graph.axes.clear()     
+                    self.graph.axes.axvline(0, color='k', linewidth=0.5, linestyle='--')
+                    self.graph.axes.axhline(0, color='k', linewidth=0.5, linestyle='--')       
+                    self.graph.fig.canvas.draw()
+        except: pass
     def Progress(self):
         TIME_LIMIT = 100
         count = 62
