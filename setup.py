@@ -6,7 +6,7 @@ os.system("sudo apt install python3-pip -y")
 os.system("sudo apt install python3-pyqt5 -y")
 os.system("python3 -m pip install numpy")
 os.system("python3 -m pip install pyqt5")
-os.system("python3 -m pip install pyqtgraph")
+os.system("python3 -m pip install matplotlib")
 os.system("chmod u+x edosv.py")
 os.system(f"ln -s {path}/edosv.desktop  ~/.local/share/applications/edosv.desktop")
 
