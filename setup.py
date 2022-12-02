@@ -8,5 +8,23 @@ os.system("python3 -m pip install numpy")
 os.system("python3 -m pip install pyqt5")
 os.system("python3 -m pip install matplotlib")
 os.system("chmod u+x edosv.py")
+
+texto = f"""[Desktop Entry]
+Name=EDOSView
+Exec=bash -c "$(dirname $(realpath $(echo %k | sed -e 's/^file:\/\///')))/edosv.py -url %U"
+Icon={path}/temps/icon1.png
+Type=Application
+Terminal=false
+Categories=Science;Chemistry;Physics;Education;
+MimeType=outhers
+X-GNOME-SingleWindow=true
+Name[pt_BR]=edosv
+"""
+with open (path+"/edosv.desktop", 'w') as saida:
+    saida.write(texto)
+print(" rm  ~/.local/share/applications/edosv.desktop")
+os.system(" rm  ~/.local/share/applications/edosv.desktop")
+print(f"ln -s {path}/edosv.desktop  ~/.local/share/applications/edosv.desktop")
 os.system(f"ln -s {path}/edosv.desktop  ~/.local/share/applications/edosv.desktop")
+print("done")
 
